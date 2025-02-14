@@ -22,49 +22,81 @@ let rec print_string_list lst =
 (********************)
 
 let rec pow x p =
-  0
+  if p = 0 then 1
+  else x * pow x (p - 1)
+
 
 (********************)
 (* Problem 2: range *)
 (********************)
 
 let rec range num1 num2 =
-  []
+  if num1 > num2 then []
+  else num1 :: range (num1 + 1) num2
 
 (**********************)
 (* Problem 3: flatten *)
 (**********************)
 
 let rec flatten l =
-  []
+  match l with
+  | [] -> []
+  | x :: xs -> x @ flatten xs
 
 (*****************************)
 (* Problem 4: remove_stutter *)
 (*****************************)
 
 let rec remove_stutter l =
-  []
+  match l with
+  | [] -> []
+  | [x] -> [x]
+  | x :: y :: xs -> if x = y then remove_stutter (y :: xs) else x :: remove_stutter (y :: xs)
 
 (*********************)
 (* Problem 5: rotate *)
 (*********************)
 
 let rotate l n =
-  []
+  let len = List.length l in
+  let n = n mod len in
+  let rec split_at n l =
+    match (n, l) with
+    | (0, rest) -> ([], rest)
+    | (_, []) -> ([], [])  
+    | (n, x :: xs) ->
+        let (left, right) = split_at (n - 1) xs in
+        (x :: left, right)
+  in
+  let (first, second) = split_at (len - n) l in  
+  second @ first  
 
 (*******************)
 (* Problem 6: jump *)
 (*******************)
 
-let jump lst1 lst2 =
-  []
+let rec jump lst1 lst2 =
+  match (lst1, lst2) with
+  | ([], _) | (_, []) -> [] 
 
-(******************)
+  | (_ :: xs, y :: ys) -> 
+      (match xs with
+       | [] -> [y] 
+       | z :: zs -> 
+           (match ys with
+            | [] -> [y] 
+            | _ :: rest_ys -> y :: z :: jump zs rest_ys))
+
+
 (* Problem 7: nth *)
 (******************)
 
 let nth l n =
-  []
+  let rec aux index l =
+    match l with
+    | [] -> []
+    | x :: xs -> if (index mod n) = (n - 1) then x :: aux (index + 1) xs else aux (index + 1) xs
+  in aux 0 l
 
 (*****************************************************)
 (* Problem 8: Digital Roots and Additive Persistence *)
@@ -77,7 +109,8 @@ let nth l n =
  *)
 
 let rec digitsOfInt n =
-  []
+  if n < 10 then [n]
+  else digitsOfInt (n / 10) @ [n mod 10]
 
 
 (* From http://mathworld.wolfram.com/AdditivePersistence.html
@@ -91,11 +124,13 @@ let rec digitsOfInt n =
  * 9876 has an additive persistence of 2 and a digital root of 3.
  *)
 
-let additivePersistence n =
-  (-1)
+let rec additivePersistence n =
+  if n < 10 then 0
+  else 1 + additivePersistence (List.fold_left (+) 0 (digitsOfInt n))
 
-let digitalRoot n =
-  (-1)
+let rec digitalRoot n =
+  if n < 10 then n
+  else digitalRoot (List.fold_left (+) 0 (digitsOfInt n))
 
 (********)
 (* Done *)
